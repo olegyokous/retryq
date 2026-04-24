@@ -54,3 +54,13 @@ func (c *Calculator) Next(attempt int) (time.Duration, bool) {
 func (c *Calculator) IsExhausted(attempt int) bool {
 	return attempt > c.policy.MaxAttempts
 }
+
+// Remaining returns the number of attempts still available starting from the
+// given attempt number. Returns 0 if attempts are already exhausted.
+func (c *Calculator) Remaining(attempt int) int {
+	remaining := c.policy.MaxAttempts - attempt + 1
+	if remaining < 0 {
+		return 0
+	}
+	return remaining
+}
