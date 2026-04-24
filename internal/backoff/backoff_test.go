@@ -64,6 +64,15 @@ func TestNext_Exhausted(t *testing.T) {
 	}
 }
 
+func TestNext_AttemptZero(t *testing.T) {
+	// Attempt 0 is invalid and should be treated as exhausted.
+	calc := backoff.New(policy())
+	_, ok := calc.Next(0)
+	if ok {
+		t.Fatal("expected ok=false for attempt 0")
+	}
+}
+
 func TestIsExhausted(t *testing.T) {
 	calc := backoff.New(policy())
 	if calc.IsExhausted(5) {
