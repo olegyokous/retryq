@@ -69,3 +69,20 @@ func TestDispatch_ForwardsHeaders(t *testing.T) {
 		t.Errorf("expected Content-Type application/json, got %q", gotHeader)
 	}
 }
+
+func TestDispatch_CancelledContextReturnsError(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(200 * time.Millisecond)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // cancel immediately before dispatching
+
+	d := dispatcher.New()
+	err := d.Dispatch(ctx, newItem(http.MethodPost, ts.URL))
+	if err == nil {
+		t.Fatal("expected error for cancelled context, got nil")
+	}
+}
