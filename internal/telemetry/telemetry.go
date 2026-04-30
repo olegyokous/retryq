@@ -46,6 +46,21 @@ func FromContext(ctx context.Context) (TraceID, bool) {
 	return id, ok && id != ""
 }
 
+// EnsureContext returns a context that is guaranteed to carry a TraceID.
+// If ctx already contains one it is returned unchanged; otherwise a new
+// TraceID is generated and stored before returning the enriched context.
+// An error is returned only if ID generation fails.
+func EnsureContext(ctx context.Context) (context.Context, TraceID, error) {
+	if id, ok := FromContext(ctx); ok {
+		return ctx, id, nil
+	}
+	id, err := New()
+	if err != nil {
+		return ctx, "", err
+	}
+	return WithContext(ctx, id), id, nil
+}
+
 // Header is the canonical HTTP header used to propagate trace IDs.
 const Header = "X-Retryq-Trace-Id"
 
