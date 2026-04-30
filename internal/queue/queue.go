@@ -89,3 +89,15 @@ func (q *Queue) Dead() []*Item {
 	}
 	return dead
 }
+
+// Size returns the total number of items currently in the queue,
+// broken down by status.
+func (q *Queue) Size() map[Status]int {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	counts := make(map[Status]int)
+	for _, item := range q.items {
+		counts[item.Status]++
+	}
+	return counts
+}
