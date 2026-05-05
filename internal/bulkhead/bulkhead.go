@@ -61,3 +61,16 @@ func (b *Bulkhead) Release() {
 func (b *Bulkhead) Inflight() int64 {
 	return b.inflight.Load()
 }
+
+// Available returns the number of additional slots that can be acquired.
+// It returns -1 if the bulkhead is disabled (MaxConcurrent <= 0).
+func (b *Bulkhead) Available() int64 {
+	if b.max <= 0 {
+		return -1
+	}
+	avail := b.max - b.inflight.Load()
+	if avail < 0 {
+		return 0
+	}
+	return avail
+}
