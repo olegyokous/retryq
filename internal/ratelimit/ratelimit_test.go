@@ -23,6 +23,13 @@ func TestAllow_ZeroRate_ReturnsNil(t *testing.T) {
 	}
 }
 
+func TestAllow_NegativeRate_ReturnsNil(t *testing.T) {
+	l := ratelimit.New(ratelimit.Options{Rate: -5, Burst: 10})
+	if l != nil {
+		t.Fatal("expected nil limiter for negative rate")
+	}
+}
+
 func TestAllow_BurstConsumption(t *testing.T) {
 	l := ratelimit.New(ratelimit.Options{Rate: 1, Burst: 3})
 	if l == nil {
